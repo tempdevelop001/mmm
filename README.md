@@ -137,3 +137,85 @@ and all_proxy environment variables.
 Also many issues and FAQs are covered in these forum threads dedicated to this program:
 
 * [Original Pooler CPUMiner Bitcointalk Thread](https://bitcointalk.org/index.php?topic=55038.0)
+
+--------------------------------
+
+  export LDFLAGS="-L/Users/12/121212/curl/2/lib"
+  export CPPFLAGS="-I/Users/12/121212/curl/2/include/curl"
+
+За основу взял лайнер - https://github.com/KotoDevelopers/cpuminer-yescrypt
+Скомпилировал курл отсюда - https://github.com/curl/curl/releases
+
+Git clone https://github.com/KotoDevelopers/cpuminer-yescrypt.git
+
+./configure --prefix=/Users/bu/121212/curl/2
+Make
+Make install
+
+https://curl.haxx.se/docs/install.html
+
+Потом подправил конфиг файл генератор - чтобы не ругался на куре и брал нужные зависимости, подправил алгоритм йесповерр16
+
+———
+
+Старт майнинга
+./minerd -a yespowerr16 -o stratum+tcp://cpu-pool.com:63368 -u YZA6YGQECxrTC76xZoNKrhh5V5xYHWao9y
+
+./minerd -a yespower -o stratum+tcp://cpu-pool.com:63358 -u CHS6cLqtXGs21N4E9Tqiagpz8HAiWFfi1P.mememe
+
+
+————
+
+Пробую скомпилировать с родным курсом
+  export LDFLAGS="-L/usr/lib"
+  export CPPFLAGS="-I/Users/bu/bububu/curl/2/include/curl"
+
+
+
+————
+Статическая сборка
+
+./configure --enable-static 
+
+CFLAGS="-O3 -Wall -march=core2 -static -DCURL_STATICLIB" CXXFLAGS="$CFLAGS -std=gnu++11 -fpermissive" LDFLAGS="-lws2_32" CCLD="x86_64-w64-mingw32-ld" CXXLD="x86_64-w64-mingw32-ld" ./configure --with-curl=/media/rodion/SSD_Linux/CryptoCurrencies/Utilities/curl-7.60.0 --with-crypto=/media/rodion/SSD_Linux/CryptoCurrencies/Utilities/openssl-1.0.2o --with-gmp=/media/rodion/SSD_Linux/CryptoCurrencies/Utilities/gmp-6.1.2 --host=x86_64-w64-mingw32 --enable-static
+
+CFLAGS="-O3 -Wall -march=core2 -static -DCURL_STATICLIB" ./configure
+
+
+/Users/bu/bububu/curl/2/lib/libcurl.a
+
+————
+Curl configure
+./configure --enable-static --disable-shared 
+
+If you want to install curl in a different file hierarchy than /usr/local, specify that when running configure:
+./configure --prefix=/path/to/curl/tree
+
+
+————
+
+otool -L minerd
+Показывает нужные библиотеки
+
+
+
+——————
+
+
+For compilers to find curl you may need to set:
+  export LDFLAGS="-L/usr/local/opt/curl/lib"
+  export CPPFLAGS="-I/usr/local/opt/curl/include"
+
+——————
+
+
+For pkg-config to find curl you may need to set:
+  export PKG_CONFIG_PATH="/usr/local/opt/curl/lib/pkgconfig"
+
+————
+
+Можно отсюда конфитюру взять и буилд
+https://github.com/tpruvot/cpuminer-multi/blob/linux/build.sh
+
+
+

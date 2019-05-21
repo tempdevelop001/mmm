@@ -39,7 +39,7 @@ int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
         uint32_t endiandata[32];
 	 if (verstring==1)
     {
-    puts("1111111");
+    //puts("1111111");
 	static const yespower_params_t params = {
 		.version = YESPOWER_1_0,
 		.N = 2048,
@@ -50,7 +50,7 @@ int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
     }
 	 if (verstring==2)
     {
-    puts("22222222");
+    //puts("22222222");
 	static const yespower_params_t params = {
 		.version = YESPOWER_1_0,
 		.N = 4096,

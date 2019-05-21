@@ -1,14 +1,16 @@
 #!/bin/bash
 
-if [ "$OS" = "Windows_NT" ]; then
-    ./mingw64.sh
-    exit 0
-fi
-
 make clean || echo clean
 
 rm -f config.status
 ./autogen.sh
+
+if [ "$OS" = "Windows_NT" ]; then
+    ./configure --with-crypto --with-curl CFLAGS="-Wall -O3 -msse2"
+    make -j4
+    strip cpuminer	
+    exit 0
+fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
 echo Mac OS

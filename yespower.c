@@ -30,7 +30,7 @@
 int verstring;
 
 int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
-        uint32_t max_nonce, unsigned long *hashes_done, int perslen, verstring)
+        uint32_t max_nonce, unsigned long *hashes_done, int perslen, int verstring)
 {
         uint32_t n = pdata[19] - 1;
         const uint32_t first_nonce = pdata[19];

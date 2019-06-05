@@ -1,4 +1,4 @@
-AC_INIT([cpuminer], [3.2])
+AC_INIT([ytn-gui-cpuminer], [0.4])
 
 AC_PREREQ([2.59c])
 AC_CANONICAL_SYSTEM

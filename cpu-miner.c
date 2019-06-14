@@ -105,12 +105,14 @@ enum algos {
 	ALGO_YESCRYPT,
 	ALGO_YESPOWER,
 	ALGO_YESPOWERR16,
+	ALGO_YESPOWERURX,
 };
 
 static const char *algo_names[] = {
 	[ALGO_YESCRYPT]		= "yescrypt",
 	[ALGO_YESPOWER]		= "yespower",
 	[ALGO_YESPOWERR16]	= "yespowerr16",
+	[ALGO_YESPOWERURX]	= "yespowerurx",
 };
 
 bool opt_debug = false;
@@ -176,6 +178,7 @@ Options:\n\
                           yescrypt yescrypt (coming soon)\n\
                           yespower yespower (default, cranepay)\n\
                           yespower yespowerr16  (yenten)\n\
+						  yespower yespowerurx  (uranium-x)\n\
   -o, --url=URL         URL of mining server\n\
   -O, --userpass=U:P    username:password pair for mining server\n\
   -u, --user=USERNAME   username for mining server\n\
@@ -1108,7 +1111,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		free(xnonce2str);
 	}
 
-	if (opt_algo == ALGO_YESCRYPT || opt_algo == ALGO_YESPOWER || opt_algo == ALGO_YESPOWERR16)
+	if (opt_algo == ALGO_YESCRYPT || opt_algo == ALGO_YESPOWER || opt_algo == ALGO_YESPOWERR16 || opt_algo == ALGO_YESPOWERURX)
 		diff_to_target(work->target, sctx->job.diff / 65536.0);
 	else
 		diff_to_target(work->target, sctx->job.diff);
@@ -1198,6 +1201,7 @@ static void *miner_thread(void *userdata)
 			case ALGO_YESCRYPT:
 			case ALGO_YESPOWER:
 			case ALGO_YESPOWERR16:
+			case ALGO_YESPOWERURX:
 				max64 = 0xfff;
 				break;
 			}
@@ -1227,6 +1231,11 @@ static void *miner_thread(void *userdata)
 			rc = scanhash_yespower(thr_id, work.data, work.target,
 			                      max_nonce, &hashes_done, perslen, 2);
 			break;
+		case ALGO_YESPOWERURX:
+			verstring=3;
+			rc = scanhash_yespower(thr_id, work.data, work.target,
+			                      max_nonce, &hashes_done, perslen, 3);
+			break;			
 		default:
 			/* should never happen */
 			goto out;

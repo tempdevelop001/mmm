@@ -163,6 +163,9 @@ extern int scanhash_yespower(int thr_id, uint32_t *pdata,
 extern int scanhash_yespowerr16(int thr_id, uint32_t *pdata,
 	const uint32_t *ptarget, uint32_t max_nonce, unsigned long *hashes_done, int perslen, int verstring);
 
+extern int scanhash_yespowerurx(int thr_id, uint32_t *pdata,
+	const uint32_t *ptarget, uint32_t max_nonce, unsigned long *hashes_done, int perslen, int verstring);	
+
 extern unsigned char *scrypt_buffer_alloc(int N);
 extern int scanhash_scrypt(int thr_id, uint32_t *pdata,
 	unsigned char *scratchbuf, const uint32_t *ptarget,

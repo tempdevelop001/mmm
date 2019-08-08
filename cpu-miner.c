@@ -107,6 +107,7 @@ enum algos {
 	ALGO_YESPOWERR16,
 	ALGO_YESPOWERURX,
 	ALGO_CPUPOWER,
+  ALGO_YESPOWERRES,
 };
 
 static const char *algo_names[] = {
@@ -115,6 +116,7 @@ static const char *algo_names[] = {
 	[ALGO_YESPOWERR16]	= "yespowerr16",
 	[ALGO_YESPOWERURX]	= "yespowerurx",
 	[ALGO_CPUPOWER]	= "cpupower",
+  [ALGO_YESPOWERRES]	= "yespowerres",
 };
 
 bool opt_debug = false;
@@ -182,6 +184,7 @@ Options:\n\
                           yespower yespowerr16  (yenten)\n\
 						  yespower yespowerurx  (uranium-x)\n\
 						  yespower cpupower  (cpuchain)\n\
+              yespower yespowerres  (resistance)\n\
   -o, --url=URL         URL of mining server\n\
   -O, --userpass=U:P    username:password pair for mining server\n\
   -u, --user=USERNAME   username for mining server\n\
@@ -1114,7 +1117,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		free(xnonce2str);
 	}
 
-	if (opt_algo == ALGO_YESCRYPT || opt_algo == ALGO_YESPOWER || opt_algo == ALGO_YESPOWERR16 || opt_algo == ALGO_YESPOWERURX || opt_algo == ALGO_CPUPOWER)
+	if (opt_algo == ALGO_YESCRYPT || opt_algo == ALGO_YESPOWER || opt_algo == ALGO_YESPOWERR16 || opt_algo == ALGO_YESPOWERURX || opt_algo == ALGO_CPUPOWER || opt_algo == ALGO_YESPOWERRES)
 		diff_to_target(work->target, sctx->job.diff / 65536.0);
 	else
 		diff_to_target(work->target, sctx->job.diff);
@@ -1206,6 +1209,7 @@ static void *miner_thread(void *userdata)
 			case ALGO_YESPOWERR16:
 			case ALGO_YESPOWERURX:
 			case ALGO_CPUPOWER:
+      case ALGO_YESPOWERRES:
 				max64 = 0xfff;
 				break;
 			}
@@ -1244,7 +1248,12 @@ static void *miner_thread(void *userdata)
 			verstring=4;
 			rc = scanhash_yespower(thr_id, work.data, work.target,
 			                      max_nonce, &hashes_done, perslen, 4);
-			break;						
+			break;
+		case ALGO_YESPOWERRES:
+			verstring=5;
+			rc = scanhash_yespower(thr_id, work.data, work.target,
+			                      max_nonce, &hashes_done, perslen, 5);
+			break;      						
 		default:
 			/* should never happen */
 			goto out;

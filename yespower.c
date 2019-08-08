@@ -79,7 +79,17 @@ int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 		.pers = "CPUpower: The number of CPU working or available for proof-of-work mining",
 		.perslen = 73
 	};
-    }		
+    }
+	 if (verstring==5)
+    {
+	static const yespower_params_t params = {
+		.version = YESPOWER_1_0,
+		.N = 4096,
+		.r = 32,
+		.pers = NULL,
+		.perslen = 0
+	};
+    }		    		
 
 /*    
     static const yespower_params_t v2 = {YESPOWER_1_0, 4096, 16, NULL, 0};
@@ -135,7 +145,14 @@ int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 		        puts("FAILED");
 		        return -1;
 		    }
-		}  		
+		}
+		if (verstring==5) {
+		    static const yespower_params_t v5 = {YESPOWER_1_0, 4096, 32, NULL, 0};
+		    if (yespower_tls((unsigned char *)endiandata, perslen, &v5, (yespower_binary_t *)hash64)) {
+		        puts("FAILED");
+		        return -1;
+		    }
+		}       		
                 if ((hash64[7] < ptarget[7]) || ((hash64[7] == ptarget[7]) && (hash64[6] < ptarget[6])) && fulltest(hash64, ptarget)) {
                         *hashes_done = n - first_nonce + 1;
                         return true;

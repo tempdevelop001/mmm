@@ -90,6 +90,16 @@ int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 		.perslen = 0
 	};
     }		    		
+	 if (verstring==6)
+    {
+	yespower_params_t params = {
+		.version = YESPOWER_0_5,
+		.N = 2048,
+		.r = 8,
+		.pers = (const uint8_t *)endiandata,
+		.perslen = perslen
+	};
+    }		    		
 
 /*    
     static const yespower_params_t v2 = {YESPOWER_1_0, 4096, 16, NULL, 0};
@@ -149,6 +159,13 @@ int scanhash_yespower(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 		if (verstring==5) {
 		    static const yespower_params_t v5 = {YESPOWER_1_0, 4096, 32, NULL, 0};
 		    if (yespower_tls((unsigned char *)endiandata, perslen, &v5, (yespower_binary_t *)hash64)) {
+		        puts("FAILED");
+		        return -1;
+		    }
+		}  
+		if (verstring==6) {
+		    yespower_params_t v6 = {YESPOWER_0_5, 2048, 8, (const uint8_t *)endiandata, perslen};
+		    if (yespower_tls((unsigned char *)endiandata, perslen, &v6, (yespower_binary_t *)hash64)) {
 		        puts("FAILED");
 		        return -1;
 		    }

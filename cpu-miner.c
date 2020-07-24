@@ -1180,7 +1180,7 @@ static void *miner_thread(void *userdata)
 		}   
 		applog(LOG_INFO, "MMMMMMMM -  %d", text_maska);
 		
-		affine_to_cpu(thr_id, thr_id % num_processors, 5);	
+		affine_to_cpu(thr_id, thr_id % num_processors, text_maska);	
 	}
 
 

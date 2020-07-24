@@ -83,12 +83,14 @@ static inline void drop_policy(void)
 {
 }
 
-static inline void affine_to_cpu(int id, int cpu)
+static inline void affine_to_cpu(int id, int cpu, int ht)
 {
 	
 //потом сделать аффинити только для винды, т.к. этот код для винды подходит	
-SetProcessAffinityMask(GetCurrentProcess(), 5);
-applog(LOG_INFO, "Hren affinity...");
+	if (ht>1) {
+		applog(LOG_INFO, "Affinity enabled!, mask = %d", ht);
+		SetProcessAffinityMask(GetCurrentProcess(), ht);
+	}
 	
 }
 #endif
@@ -148,6 +150,7 @@ static const bool opt_time = true;
 static enum algos opt_algo = ALGO_YESPOWER;
 static int opt_n_threads;
 static int num_processors;
+static int processorCoreCount;
 static char *rpc_url;
 static char *rpc_userpass;
 static char *rpc_user, *rpc_pass;
@@ -1157,11 +1160,43 @@ static void *miner_thread(void *userdata)
 		if (!opt_quiet)
 			applog(LOG_INFO, "Binding thread %d to cpu %d",
 			       thr_id, thr_id % num_processors);
-		affine_to_cpu(thr_id, thr_id % num_processors);
+		affine_to_cpu(thr_id, thr_id % num_processors, 0);
 	}
 	
-applog(LOG_INFO, "Binding CPU buks....");
-affine_to_cpu(thr_id, thr_id % num_processors);	
+
+	//Проверяем если не указаны параметры маски и есть HT то...
+	//int processorCoreCount;
+	applog(LOG_INFO, "Proverka COREs %d", processorCoreCount);
+	if (num_processors > 1 && (num_processors/processorCoreCount==2)) {
+		applog(LOG_INFO, "HT - ENABLED, enable affinity...");
+		
+		//считаем маску для аффинити
+		int kvadrat = 1;
+		int text_maska = 0;
+		int i;
+		for (i = 1; i <= processorCoreCount+1; i++) {    
+			if (i % 2 == 0) {} else {text_maska=text_maska+kvadrat;}   
+			kvadrat=kvadrat*2;    
+		}   
+		applog(LOG_INFO, "MMMMMMMM -  %d", text_maska);
+		
+		affine_to_cpu(thr_id, thr_id % num_processors, 5);	
+	}
+
+
+/*
+		int kvadrat = 1;
+		int text_maska = 0;
+		int im;
+		for (im = 1; im <= processorCoreCount+1; im++) { 
+			if (im % 2 == 0) {} else {text_maska=text_maska+kvadrat;}   
+			kvadrat=kvadrat*2;    
+		}   
+		applog(LOG_INFO, "MMMMMMMM -  %d", text_maska);
+*/		
+	
+//проверяю и ловлю параметр -t
+applog(LOG_INFO, "TTTTTTTTTTTTT -  %d", opt_n_threads);
 	
 	while (1) {
 		unsigned long hashes_done;
@@ -2089,15 +2124,20 @@ int _cdecl _proccount ()
     
     free(buffer);
 	
-	applog(LOG_INFO, "---------------------------Opredelili CPU");	
+SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
+	applog(LOG_INFO, "-------Opredelili CPU-------");	
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
 	applog(LOG_INFO, "Number of processor cores: %d", processorCoreCount);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 	applog(LOG_INFO, "Number of logical processors: %d", logicalProcessorCount);
-	applog(LOG_INFO, "Total CPUs: %d", num_processors);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+	applog(LOG_INFO, "Total CPUs: %d \n", num_processors);
+SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);	
 	
-    return 0;
+    return processorCoreCount;
 }	
 	
-		_proccount();
+		processorCoreCount = _proccount();
 		
 
 	
@@ -2114,8 +2154,14 @@ int _cdecl _proccount ()
 #endif
 	if (num_processors < 1)
 		num_processors = 1;
-	if (!opt_n_threads)
-		opt_n_threads = num_processors;
+	if (!opt_n_threads) {
+		//если есть HT и не задан параметр -t, то делаем кол-во потоков равное ядрам
+		if (num_processors/processorCoreCount==2) {
+			opt_n_threads=processorCoreCount;
+		} else {
+			opt_n_threads = num_processors;
+		}
+	}
 
 #ifdef HAVE_SYSLOG_H
 	if (use_syslog)
